@@ -1,47 +1,59 @@
-import random
-from hashlib import sha256
-from Crypto.Util.number import getPrime, inverse
+from fastapi import FastAPI, File, UploadFile, HTTPException
+from typing import Dict
+import hashlib
+from rsa_python import rsa
 
-def miller_rabin(n, k=40):
-    # Implement the Miller-Rabin primality test
-    pass
+app = FastAPI()
 
-def generate_prime_candidate(length):
-    # Generate a potential prime number of a given bit length
-    pass
+def generate_key_pair() -> Dict[str, int]:
+    key_pair = rsa.generate_key_pair(256)
+    return {
+        "public_key": key_pair["public"],
+        "private_key": key_pair["private"],
+        "modulus": key_pair["modulus"]
+    }
 
-def generate_prime_number(length=1024):
-    # Generate a prime number by repeatedly calling miller_rabin
-    p = 4
-    while not miller_rabin(p, 40):
-        p = generate_prime_candidate(length)
-    return p
+def sign_file(file_content: bytes, private_key: int, modulus: int) -> bytes:
+    # Hash the file content using SHA-256
+    hash_object = hashlib.sha256()
+    hash_object.update(file_content)
+    hashed_message = hash_object.digest()
+    # Encrypt the hashed message with the private key
+    signature = rsa.encrypt(hashed_message, private_key, modulus)
+    return signature
 
-def find_e(phi):
-    # Find an encryption key e
-    e = 2
-    while e < phi and gcd(e, phi) != 1:
-        e += 1
-    return e
+def verify_signature(file_content: bytes, signature: bytes, public_key: int, modulus: int) -> bool:
+    # Decrypt the signature using the public key
+    decrypted_signature = rsa.decrypt(signature, public_key, modulus)
+    # Hash the file content using SHA-256
+    hash_object = hashlib.sha256()
+    hash_object.update(file_content)
+    hashed_message = hash_object.digest()
+    # Compare the decrypted signature with the hashed file content
+    return decrypted_signature == hashed_message
 
-def rsa_encrypt(msg, pub_key):
-    # Encrypt message using RSA
-    e, n = pub_key
-    return pow(msg, e, n)
+@app.post("/generate-key-pair")
+async def generate_rsa_key_pair() -> Dict[str, int]:
+    return generate_key_pair()
 
-def rsa_decrypt(enc_msg, priv_key):
-    # Decrypt message using RSA
-    d, n = priv_key
-    return pow(enc_msg, d, n)
+@app.post("/sign-file")
+async def sign_file_endpoint(file: UploadFile = File(...), private_key: int = None, modulus: int = None) -> bytes:
+    try:
+        file_content = await file.read()
+        if private_key is None or modulus is None:
+            raise HTTPException(status_code=400, detail="Private key and modulus must be provided.")
+        signature = sign_file(file_content, private_key, modulus)
+        return signature
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-def sign_message(message, priv_key):
-    # Sign a message using RSA
-    hash = int.from_bytes(sha256(message.encode()).digest(), byteorder='big')
-    return rsa_decrypt(hash, priv_key)  # Private key operation
-
-def verify_signature(message, signature, pub_key):
-    # Verify a signature using RSA
-    hash = int.from_bytes(sha256(message.encode()).digest(), byteorder='big')
-    return hash == rsa_encrypt(signature, pub_key)  # Public key operation
-
-# Example usage within a main method or GUI event handlers
+@app.post("/verify-signature")
+async def verify_signature_endpoint(file: UploadFile = File(...), signature: bytes = None, public_key: int = None, modulus: int = None) -> Dict[str, bool]:
+    try:
+        file_content = await file.read()
+        if signature is None or public_key is None or modulus is None:
+            raise HTTPException(status_code=400, detail="Signature, public key, and modulus must be provided.")
+        is_verified = verify_signature(file_content, signature, public_key, modulus)
+        return {"is_verified": is_verified}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

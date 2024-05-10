@@ -1,5 +1,5 @@
 from __future__ import print_function
-from Aziz60bit import SHA60v
+import SHA60v
 
 def collision_match(msg1, msg2):
   
