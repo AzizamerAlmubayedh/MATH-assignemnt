@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cybersecurity Encryption/Decryption</title>
+<style>
+    body {
+        font-family: 'Courier New', Courier, monospace;
+        background-color: #222;
+        color: #fff;
+        text-align: center;
+        padding-top: 50px;
+    }
+    #greeting {
+        font-size: 36px;
+        margin-bottom: 40px;
+    }
+    .button {
+        display: inline-block;
+        padding: 15px 30px;
+        border: none;
+        cursor: pointer;
+        font-size: 20px;
+        border-radius: 5px;
+        margin: 0 10px;
+        transition: background-color 0.3s ease;
+    }
+    #encrypt {
+        background-color: #0f0;
+        color: #0b241a;
+    }
+    #decrypt {
+        background-color: #f00;
+        color: #0b241a;
+    }
+    .button:hover {
+        filter: brightness(1.2);
+    }
+</style>
+</head>
+<body>
+    <h1 id="greeting">Welcome to Aziz's Encryption/Decryption</h1>
+    <div id="buttons">
+        <button id="encrypt" class="button" onclick="go()">Encrypt 🔒</button>
+        <button id="decrypt" class="button" onclick="go2()">Decrypt 🔓</button>
+    </div>
+
+
+    <script>
+            function go()
+            {
+                window.location.href = "EncryptPage.html";
+            }
+
+            function go2()
+            {
+                window.location.href = "DecryptPage.html";
+            }
+    </script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>File Encryption</title>
+<style>
+    body {
+        font-family: 'Courier New', Courier, monospace;
+        background-color: #222;
+        color: #fff;
+        text-align: center;
+        padding-top: 50px;
+    }
+    h1 {
+        font-size: 36px;
+        margin-bottom: 40px;
+    }
+    .button {
+        display: inline-block;
+        padding: 15px 30px;
+        border: none;
+        cursor: pointer;
+        font-size: 20px;
+        border-radius: 5px;
+        margin: 0 10px;
+        transition: background-color 0.3s ease;
+    }
+    #browse {
+        background-color: #0f0;
+        color: #6f0f0f;
+    }
+    #validate {
+        background-color: rgb(239, 79, 79);
+        color: #6f0f0f;
+    }
+
+    .button:hover {
+        filter: brightness(1.2);
+    }
+    input[type="file"] {
+        display: none;
+    }
+    label {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 20px;
+    }
+    textarea {
+        width: 60%;
+        height: 100px;
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+    .public-info {
+        margin-top: 30px;
+        font-size: 20px;
+    }
+</style>
+</head>
+<body>
+    <h1>Choose a file please 📂</h1>
+    <form id="encryptionForm" onsubmit="return encryptFile()">
+        <div>
+            <input type="file" id="fileInput" name="fileInput" required>
+            <label for="fileInput" class="button" id="browse">Browse 🔍</label>
+            <div>
+                <p id="fileLabel"></p>
+            </div>
+            <label for="privateKey">Enter your private Key please:</label>
+            <textarea id="privateKey" name="privateKey" required></textarea>
+        </div>
+        <br>
+        <button type="submit" class="button" id="validate">Sign 📝</button>
+    </form>
+
+    <div class="public-info">
+        <p>Here is your public information:</p>
+        <p>N = <span id="publicN"></span></p>
+        <p>Public 🗝️ = <span id="publicKey"></span></p>
+    </div>
+
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function() {
+            var fileName = this.value.split('\\').pop();
+            document.getElementById('fileLabel').textContent = 'Selected file: ' + fileName;
+        });
+
+        function encryptFile() {
+            var fileInput = document.getElementById('fileInput').files[0];
+            var privateKey = document.getElementById('privateKey').value;
+
+            if (!fileInput) {
+                alert("Please choose a file first!");
+                return false;
+            }
+
+            // Simulating validation process
+            var isValid = true; // Replace with actual validation logic
+
+            if (isValid) {
+                goToResult();
+                return true; // Validation passed
+            } else {
+                alert("Validation failed!");
+                return false; // Validation failed
+            }
+        }
+
+        function goToResult() {
+            window.location.href = "resultOfEncryption.html";
+        }
+    </script>
+</body>
+</html>
